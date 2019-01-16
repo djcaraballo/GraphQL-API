@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/djcaraballo/GraphQL-API/issues"
   },
-  "homepage": "https://github.com/djcaraballo/GraphQL-API#readme"
+  "homepage": "https://github.com/djcaraballo/GraphQL-API#readme",
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
 }
