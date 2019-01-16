@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { apiKey } from "../apiKey"
+import memoize from 'memoizee'
 
 class NomicsConnector {
   constructor(apiKey) {
@@ -9,6 +10,15 @@ class NomicsConnector {
       repsonseType: 'json',
       params: { key: apiKey }
     })
+
+    this.getPricesByCurrencyCached = memoize(
+      this.getPricesByCurrency,
+      {
+        maxAge: 300000, //5 minutes til cache expiration
+        preFetch: 0.05, //pre-fetch 15s before expiration
+        promise: 'then' //handle async
+      }
+    )
   }
 
   async getPrices() {
@@ -25,7 +35,7 @@ class NomicsConnector {
   }
 
   async getPrice(currency) {
-    const pricesByCurrency = await this.getPricesByCurrency()
+    const pricesByCurrency = await this.getPricesByCurrencyCached()
     return pricesByCurrency[currency]
   }
 }
