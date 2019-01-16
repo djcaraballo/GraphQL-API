@@ -4,7 +4,9 @@
   "description": "cryptocurrency price change api with graphql",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "npm test",
+    "build": "backpack build",
+    "start": "node ./build/main.js"
   },
   "repository": {
     "type": "git",
