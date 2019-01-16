@@ -18,6 +18,7 @@
   "homepage": "https://github.com/djcaraballo/GraphQL-API#readme",
   "dependencies": {
     "axios": "^0.18.0",
-    "backpack-core": "^0.8.3"
+    "backpack-core": "^0.8.3",
+    "memoizee": "^0.4.14"
   }
 }
