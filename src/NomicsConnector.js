@@ -15,6 +15,19 @@ class NomicsConnector {
     const response = await this.client('/prices')
     return response.data
   }
+
+  async getPricesByCurrency() {
+    const prices = this.getPrices()
+    return prices.reduce((pricesByCurrency, { currency, price }) => {
+      pricesByCurrency[currency] = prices
+      return pricesByCurrency
+    }, {})
+  }
+
+  async getPrice(currency) {
+    const pricesByCurrency = await this.getPricesByCurrency()
+    return pricesByCurrency[currency]
+  }
 }
 
 export default NomicsConnector
