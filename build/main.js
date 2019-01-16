@@ -88,6 +88,83 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
+/***/ "./apiKey.js":
+/*!*******************!*\
+  !*** ./apiKey.js ***!
+  \*******************/
+/*! exports provided: apiKey */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "apiKey", function() { return apiKey; });
+const apiKey = "00c79cf82f7d0908c63dbd3bc3d8e61e";
+
+/***/ }),
+
+/***/ "./src/NomicsConnector.js":
+/*!********************************!*\
+  !*** ./src/NomicsConnector.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "axios");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var memoizee__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! memoizee */ "memoizee");
+/* harmony import */ var memoizee__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(memoizee__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+class NomicsConnector {
+  constructor(apiKey) {
+    this.client = axios__WEBPACK_IMPORTED_MODULE_0___default.a.create({
+      baseURL: 'https://api.nomics.com/v1',
+      method: 'get',
+      repsonseType: 'json',
+      params: {
+        key: apiKey
+      }
+    });
+    this.getPricesByCurrencyCached = memoizee__WEBPACK_IMPORTED_MODULE_1___default()(this.getPricesByCurrency, {
+      maxAge: 300000,
+      //5 minutes til cache expiration
+      preFetch: 0.05,
+      //pre-fetch 15s before expiration
+      promise: 'then' //handle async
+
+    });
+  }
+
+  async getPrices() {
+    const response = await this.client('/prices');
+    return response.data;
+  }
+
+  async getPricesByCurrency() {
+    const prices = await this.getPrices();
+    return prices.reduce((pricesByCurrency, {
+      currency,
+      price
+    }) => {
+      pricesByCurrency[currency] = price;
+      return pricesByCurrency;
+    }, {});
+  }
+
+  async getPrice(currency) {
+    const pricesByCurrency = await this.getPricesByCurrencyCached();
+    return pricesByCurrency[currency];
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (NomicsConnector);
+
+/***/ }),
+
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
@@ -99,7 +176,12 @@ module.exports =
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var graphql_yoga__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! graphql-yoga */ "graphql-yoga");
 /* harmony import */ var graphql_yoga__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(graphql_yoga__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _NomicsConnector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./NomicsConnector */ "./src/NomicsConnector.js");
+/* harmony import */ var _apiKey__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../apiKey */ "./apiKey.js");
 
+
+
+const NOMICS_API_KEY = _apiKey__WEBPACK_IMPORTED_MODULE_2__["apiKey"];
 const typeDefs = `
   type Query {
     exchangeRate(currency: String!): Float
@@ -107,14 +189,15 @@ const typeDefs = `
   `;
 const resolvers = {
   Query: {
-    exchangeRate: (root, variables, context) => {
-      return 9000.01;
-    }
+    exchangeRate: (root, variables, context) => context.nomics.getPrice(variables.currency)
   }
 };
 const server = new graphql_yoga__WEBPACK_IMPORTED_MODULE_0__["GraphQLServer"]({
   typeDefs,
-  resolvers
+  resolvers,
+  context: {
+    nomics: new _NomicsConnector__WEBPACK_IMPORTED_MODULE_1__["default"](NOMICS_API_KEY)
+  }
 }); //  Go to http://localhost:4000 to test your API
 
 server.start(() => console.log('Server running on :4000'));
@@ -133,6 +216,17 @@ module.exports = __webpack_require__(/*! /Users/djcaraballo/Turing 2.0/StudyProj
 
 /***/ }),
 
+/***/ "axios":
+/*!************************!*\
+  !*** external "axios" ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("axios");
+
+/***/ }),
+
 /***/ "graphql-yoga":
 /*!*******************************!*\
   !*** external "graphql-yoga" ***!
@@ -141,6 +235,17 @@ module.exports = __webpack_require__(/*! /Users/djcaraballo/Turing 2.0/StudyProj
 /***/ (function(module, exports) {
 
 module.exports = require("graphql-yoga");
+
+/***/ }),
+
+/***/ "memoizee":
+/*!***************************!*\
+  !*** external "memoizee" ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("memoizee");
 
 /***/ })
 

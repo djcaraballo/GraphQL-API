@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { apiKey } from "../apiKey"
 import memoize from 'memoizee'
 
 class NomicsConnector {
@@ -27,9 +26,10 @@ class NomicsConnector {
   }
 
   async getPricesByCurrency() {
-    const prices = this.getPrices()
-    return prices.reduce((pricesByCurrency, { currency, price }) => {
-      pricesByCurrency[currency] = prices
+    const prices = await this.getPrices()
+    return prices.reduce(
+      (pricesByCurrency, { currency, price }) => {
+      pricesByCurrency[currency] = price
       return pricesByCurrency
     }, {})
   }
