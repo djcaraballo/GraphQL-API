@@ -1,9 +1,10 @@
 import { GraphQLServer } from 'graphql-yoga'
 
-const typeDefs = 
+const typeDefs = `
   type Query {
     exchangeRate(currency: String!): Float
   }
+  `
 
 const resolvers = {
   Query: {
