@@ -1,0 +1,19 @@
+{
+  "name": "crypto-pricefeed",
+  "version": "1.0.0",
+  "description": "cryptocurrency price change api with graphql",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djcaraballo/GraphQL-API.git"
+  },
+  "author": "Dina Caraballo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/djcaraballo/GraphQL-API/issues"
+  },
+  "homepage": "https://github.com/djcaraballo/GraphQL-API#readme"
+}
